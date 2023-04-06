@@ -1,8 +1,10 @@
 import lombok.extern.slf4j.Slf4j;
+import util.ByteBufferUtil;
 
 import java.io.FileInputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.Charset;
 
 /**
  * @author pancm
@@ -11,16 +13,15 @@ import java.nio.channels.FileChannel;
 @Slf4j
 public class TestByteBuffer {
 
-    public static void main(String[] args) {
+    public static void main(String[] args){
         //file channel
         /**
          * 常用的 Channel 类有：
          * FileChannel、用于文件的数据读写
-         * DatagramChannel、
-         * ServerSocketChannel(服务端) 和 SocketChannel(客户端)。
-         * DatagramChannel 用于 UDP 的数据读写，
-         * ServerSocketChannel 和 SocketChannel 用于 TCP 的 数据读写。
-         *
+         * DatagramChannel
+         * ServerSocketChannel(服务端) 和 SocketChannel(客户端)
+         * DatagramChannel 用于 UDP 的数据读写
+         * ServerSocketChannel 和 SocketChannel 用于 TCP 的 数据读写
          */
         //1.输入输出流，2.randomAccessFile
         try{
@@ -43,7 +44,7 @@ public class TestByteBuffer {
                 byteBuffer.clear();//切换为写模式
             }
 
-         } catch (Exception e){
+        } catch (Exception e){
 
         }
 
