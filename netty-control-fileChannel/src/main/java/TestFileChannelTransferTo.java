@@ -23,7 +23,7 @@ public class TestFileChannelTransferTo {
                 System.out.println("position:" + (size - left) + " left:" + left);
                 //transferTo方法每次返回的就是还剩多少字节
                 left -= from.transferTo(size - left,left,to);
-
+                System.out.println("aaaa");
             }
 
         }catch (Exception e){
