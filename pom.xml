@@ -11,6 +11,7 @@
     <modules>
         <module>netty-control-buffer</module>
         <module>netty-control-fileChannel</module>
+        <module>netty-control-nio</module>
     </modules>
 
     <properties>
