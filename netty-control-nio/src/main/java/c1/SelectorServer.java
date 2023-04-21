@@ -9,13 +9,10 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
-import static util.ByteBufferUtil.debugRead;
+import static util.ByteBufferUtil.debugAll;
 
 /**
  * selector 应用
@@ -25,6 +22,25 @@ import static util.ByteBufferUtil.debugRead;
 @Slf4j
 public class SelectorServer {
 
+    private static void split(ByteBuffer source) {
+        source.flip();
+        for (int i = 0; i < source.limit(); i++) {
+            //get(i)方法不改变position的位置
+            if(source.get(i) == '\n'){  //学习编解码的时候有比"=="更好的办法
+                int length = i + 1 - source.position();
+                ByteBuffer target = ByteBuffer.allocate(length);
+                //向target里写
+                for (int j = 0; j < length; j++) {
+                    //注意get（）方法会改变position的位置
+                    target.put(source.get());
+                }
+                debugAll(target);
+            }
+        }
+        debugAll(source);
+        source.compact();
+        System.out.println(source.position());
+    }
     /**
      * selector演示
      * @param args
@@ -65,21 +81,28 @@ public class SelectorServer {
                     ServerSocketChannel channel = (ServerSocketChannel) key.channel();
                     SocketChannel sc = channel.accept();
                     sc.configureBlocking(false);
-                    SelectionKey scKey = sc.register(selector, 0, null);
+                    ByteBuffer buffer = ByteBuffer.allocate(16);
+                    SelectionKey scKey = sc.register(selector, 0, buffer);//第三个参数是附件的意思，可以将buffer放进去，一个channel就关联一个buffer了
                     scKey.interestOps(SelectionKey.OP_READ);
                     log.debug("sc:{}", sc);
                     log.debug("scKey:{}", scKey);
                 }else if(key.isReadable()){
                     try {
                         SocketChannel channel = (SocketChannel) key.channel();//拿到触发事件的channel
-                        ByteBuffer buffer = ByteBuffer.allocate(4);
+                        ByteBuffer buffer = (ByteBuffer) key.attachment();
                         int read = channel.read(buffer);
                         if(read == -1){
                             key.cancel();
                         }else {
-                            buffer.flip();
-                            System.out.println(Charset.defaultCharset().decode(buffer));
-                            //debugRead(buffer);
+                            //处理半包和黏包
+                            split(buffer);
+                            //如果超出限制进行扩容，将新的bytebuffer放到selectionKey里
+                            if(buffer.position() == buffer.limit()){
+                                ByteBuffer newBuffer =  ByteBuffer.allocate(buffer.capacity() * 2);
+                                buffer.flip();
+                                newBuffer.put(buffer);
+                                key.attach(newBuffer);
+                            }
                         }
                     }catch (IOException ie){
                         ie.printStackTrace();
