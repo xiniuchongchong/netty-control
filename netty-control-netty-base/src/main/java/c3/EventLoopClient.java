@@ -35,7 +35,7 @@ public class EventLoopClient {
 //        channelFuture.sync();
 //        Channel channel = channelFuture.channel();
 //        log.debug("{}",channel);
-//        //向服务器发送数据
+//        向服务器发送数据
 //        channel.writeAndFlush(new Date() + ": hello world!");
         //2.2使用addListener()方法异步处理结果  将等连接结果的工作交给nio线程
         channelFuture.addListener(new ChannelFutureListener() {
@@ -45,7 +45,6 @@ public class EventLoopClient {
                log.debug("{}",channel);
                 //向服务器发送数据
                channel.writeAndFlush(new Date() + ": hello world!");
-
             }
         });
 
